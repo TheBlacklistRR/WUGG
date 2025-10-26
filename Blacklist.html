@@ -566,9 +566,11 @@ const noCacheURL = url => `${url}?v=${Date.now()}`;
 async function precargarPerfiles() {
   for (const url of urlsPerfiles) {
     const frame = document.createElement("iframe");
+
+    frame.setAttribute("sandbox", "allow-scripts allow-same-origin");
+
     frame.src = noCacheURL(url);
     frame.style.display = "none";
-    frame.loading = "eager";
     document.body.appendChild(frame);
 
     await new Promise(resolve => {
