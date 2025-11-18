@@ -6,9 +6,41 @@
 <link rel="icon" type="image/png" href="https://github.com/IsabelGulloso/BlackList/blob/main/BLACKLIST/Select%20Menu/Logo/Logo%2064%C3%9764.png?raw=true">
   <style>
 
+/* LIENZO FIJO DE 3264×1550 */
+#pantalla {
+  position: absolute;
+  width: 3264px;
+  height: 1550px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  transform-origin: center center;
+  overflow: hidden;
+}
+
+/* Autoescale */
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  background: black; /* Fondo Negro */
+  overflow: hidden;
+}
+
 body {
   margin: 0;
   overflow: hidden;
+}
+
+/* Size HUD Fix */
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
+/* Anti Alteración de Tamaños Inesperados */
+img, video {
+  max-width: none !important;
 }
 
 #perfil {
@@ -29,7 +61,7 @@ body {
       top: 0; left: 0;
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       z-index: 32;
       pointer-events: none;
     }
@@ -38,7 +70,7 @@ body {
       top: 0; left: 0;
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       z-index: 33;
       display: none;
       pointer-events: none;
@@ -83,7 +115,7 @@ body {
       position: absolute;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       display: none;
     }
 
@@ -97,7 +129,7 @@ body {
       top: 0; left: 0;
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       z-index: 0;
     }
 
@@ -107,7 +139,7 @@ body {
       top: 0; left: 0;
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       z-index: 1;
       opacity: 0;
       transition: opacity 5s ease-in-out;
@@ -119,7 +151,7 @@ body {
       left: 0;
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       z-index: 11;
       pointer-events: none;
     }
@@ -130,7 +162,7 @@ body {
       top: 0; left: 0;
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       z-index: 999;
       transition: opacity 1s ease;
     }
@@ -234,6 +266,7 @@ body.debug #overlayBienvenida {
   </style>
 </head>
 <body>
+  <div id="pantalla">
 
   <!-- Pantalla de Bienvenida -->
   <img id="bienvenida" src="https://github.com/IsabelGulloso/BlackList/blob/main/HDIntro.png?raw=true">
@@ -671,9 +704,9 @@ function cargarPerfil(url) {
   nuevo.style.height = "100%";
   nuevo.style.border = "none";
   nuevo.style.display = "none";
-  nuevo.zIndex = "5";
+  nuevo.style.zIndex = "4";
 
-  document.body.appendChild(nuevo);
+  document.getElementById("pantalla").appendChild(nuevo);
 
   nuevo.onload = () => {
     if (esteId !== cargaId) return;
@@ -738,6 +771,17 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+function ajustarEscala() {
+const baseW = 3264; 
+const baseH = 1550;
+  const escala = Math.min(window.innerWidth / baseW, window.innerHeight / baseH);
+  document.getElementById("pantalla").style.transform =
+    `translate(-50%, -50%) scale(${escala})`;
+}
+window.addEventListener("resize", ajustarEscala);
+window.addEventListener("load", ajustarEscala);
+
   </script>
+  </div>
 </body>
 </html>
