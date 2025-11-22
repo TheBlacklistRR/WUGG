@@ -6,6 +6,16 @@
 <link rel="icon" type="image/png" href="https://github.com/IsabelGulloso/BlackList/blob/main/BLACKLIST/Select%20Menu/Logo/Logo%2064%C3%9764.png?raw=true">
   <style>
 
+#blackCover {
+  position: fixed;
+  inset: 0;
+  background: black;
+  z-index: 999999;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.7s ease;
+}
+
 /* LIENZO FIJO DE 3264×1550 */
 #pantalla {
   position: absolute;
@@ -13,9 +23,9 @@
   height: 1550px;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) scale(1);
   transform-origin: center center;
   overflow: hidden;
+  visibility: hidden;
 }
 
 /* Autoescale */
@@ -41,6 +51,15 @@ html, body {
 /* Anti Alteración de Tamaños Inesperados */
 img, video {
   max-width: none !important;
+}
+
+#fxLines, #fxGrid, #fxScan, #fxGlitch, #fxPulses, #fxHex {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3264px !important;
+    height: 1550px !important;
+    pointer-events: none;
 }
 
 #perfil {
@@ -152,7 +171,7 @@ img, video {
       width: 100%;
       height: 100%;
       object-fit: contain;
-      z-index: 11;
+      z-index: 20;
       pointer-events: none;
     }
 
@@ -265,7 +284,8 @@ body.debug #overlayBienvenida {
 
   </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
+<div id="blackCover"></div>
   <div id="pantalla">
 
   <!-- Pantalla de Bienvenida -->
@@ -280,12 +300,22 @@ body.debug #overlayBienvenida {
     <source src="SinLinkDeVideoAsignado" type="video/mp4">
   </video>
 
+<!-- Efectos del Mapa -->
+<canvas id="fxLines" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:6;"></canvas>
+<canvas id="fxGrid" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:7;"></canvas>
+<canvas id="fxScan" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:8;"></canvas>
+<canvas id="fxGlitch" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9;"></canvas>
+<canvas id="fxPulses" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:10;"></canvas>
+<canvas id="fxHex" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:10;"></canvas>
+<!-- Map Effects -->
+
   <!-- HOME Icon -->
   <img src="https://github.com/IsabelGulloso/BlackList/blob/main/BLACKLIST/Select%20Menu/Home%20Icon%2001.png?raw=true" class="overlay-hover" data-hover="https://github.com/IsabelGulloso/BlackList/blob/main/BLACKLIST/Select%20Menu/Home%20Icon%2002.png?raw=true">
 
 <!-- VEHICLE Icon -->
 <img id="vehicleIcon"
-     src="https://raw.githubusercontent.com/IsabelGulloso/BlackList/refs/heads/main/BLACKLIST/Racers/Menu/Vehicle%20Icon%2001.png"
+
+src="https://raw.githubusercontent.com/IsabelGulloso/BlackList/refs/heads/main/BLACKLIST/Racers/Menu/Vehicle%20Icon%2001.png"
      data-hover="https://github.com/IsabelGulloso/BlackList/blob/main/BLACKLIST/Racers/Menu/Vehicle%20Icon%2002.png?raw=true">
 
 <!-- Zona Fantasma Hover -->
@@ -355,6 +385,7 @@ body.debug #overlayBienvenida {
   </div>
 
   <script>
+
     const switcherImgs = [
       {normal:"https://github.com/IsabelGulloso/BlackList/blob/main/Test%20Imagen%20Fase%20Burnout%2001.png?raw=true", hover:"https://github.com/IsabelGulloso/BlackList/blob/main/Test%20Imagen%20Fase%20Burnout%2002.png?raw=true"},
       {normal:"https://github.com/IsabelGulloso/BlackList/blob/main/Test%20Imagen%20Fase%20Casual%2001.png?raw=true", hover:"https://github.com/IsabelGulloso/BlackList/blob/main/Test%20Imagen%20Fase%20Casual%2002.png?raw=true"},
@@ -704,7 +735,7 @@ function cargarPerfil(url) {
   nuevo.style.height = "100%";
   nuevo.style.border = "none";
   nuevo.style.display = "none";
-  nuevo.style.zIndex = "4";
+  nuevo.style.zIndex = "15";
 
   document.getElementById("pantalla").appendChild(nuevo);
 
@@ -772,14 +803,217 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function ajustarEscala() {
-const baseW = 3264; 
-const baseH = 1550;
+  const baseW = 3264;
+  const baseH = 1550;
   const escala = Math.min(window.innerWidth / baseW, window.innerHeight / baseH);
-  document.getElementById("pantalla").style.transform =
-    `translate(-50%, -50%) scale(${escala})`;
+  const pantalla = document.getElementById("pantalla");
+
+  pantalla.style.transform = `translate(-50%, -50%) scale(${escala})`;
+
+  pantalla.style.visibility = "visible";
 }
+
+window.addEventListener("DOMContentLoaded", ajustarEscala);
 window.addEventListener("resize", ajustarEscala);
-window.addEventListener("load", ajustarEscala);
+
+/* =Map Effects= */
+
+const CANVAS_W = 3264;
+const CANVAS_H = 1550;
+
+function resizeCanvas(id){
+  const c = document.getElementById(id);
+  c.width = CANVAS_W;
+  c.height = CANVAS_H;
+  return c.getContext("2d");
+}
+
+let ctxLines  = resizeCanvas("fxLines");
+let ctxGrid   = resizeCanvas("fxGrid");
+let ctxScan   = resizeCanvas("fxScan");
+let ctxGlitch = resizeCanvas("fxGlitch");
+let ctxPulses = resizeCanvas("fxPulses");
+let ctxHex    = resizeCanvas("fxHex");
+
+/* Configuración */
+const FX = {
+  lines: { enabled:true, colorNode:"rgba(0,255,70,0.9)", colorLine:"rgba(0,255,70,0.9)", speed:0.8, linkDistance:150, count:50 },
+  grid:  { enabled:true, color:"rgba(255,255,255,0.2)", size:40 },
+  scan:  { enabled:true, color:"rgba(255,255,255,0.05)", spacing:4 },
+  glitch:{ enabled:true, color:"rgba(0,255,70,0.1)", intervalSeconds:15, sizeMin:40, sizeMax:120 },
+  pulses:{ enabled:true, color:"rgba(0,255,70,0.9)", lineWidth:2, speed:2, fadeSpeed:0.02, intervalSeconds:5, amount:1, maxRadius:300 },
+  hex:   { enabled:true, color:"rgba(0,255,70,0.1)", size:35 }
+};
+
+/* Líneas */
+let nodes = [];
+for(let i=0;i<FX.lines.count;i++){
+  nodes.push({
+    x: Math.random()*CANVAS_W,
+    y: Math.random()*CANVAS_H,
+    vx: (Math.random()-.5)*FX.lines.speed,
+    vy: (Math.random()-.5)*FX.lines.speed
+  });
+}
+
+function drawLines(){
+  ctxLines.clearRect(0,0,CANVAS_W,CANVAS_H);
+  ctxLines.fillStyle = FX.lines.colorNode;
+  ctxLines.strokeStyle = FX.lines.colorLine;
+
+  nodes.forEach(n=>{
+    n.x+=n.vx; 
+    n.y+=n.vy;
+    if(n.x<0||n.x>CANVAS_W) n.vx*=-1;
+    if(n.y<0||n.y>CANVAS_H) n.vy*=-1;
+
+    ctxLines.beginPath();
+    ctxLines.arc(n.x,n.y,5,0,Math.PI*2);
+    ctxLines.fill();
+  });
+
+  for(let a=0;a<nodes.length;a++){
+    for(let b=a+1;b<nodes.length;b++){
+      let dx = nodes[a].x - nodes[b].x;
+      let dy = nodes[a].y - nodes[b].y;
+      let dist = Math.sqrt(dx*dx+dy*dy);
+      if(dist < FX.lines.linkDistance){
+        ctxLines.globalAlpha = 1500000 - dist/FX.lines.linkDistance;
+        ctxLines.beginPath();
+        ctxLines.moveTo(nodes[a].x,nodes[a].y);
+        ctxLines.lineTo(nodes[b].x,nodes[b].y);
+        ctxLines.stroke();
+      }
+    }
+  }
+  ctxLines.globalAlpha = 1;
+}
+
+/* Grid */
+function drawGrid(){
+  ctxGrid.clearRect(0,0,CANVAS_W,CANVAS_H);
+  ctxGrid.strokeStyle = FX.grid.color;
+  for(let x=0;x<CANVAS_W;x+=FX.grid.size){
+    ctxGrid.beginPath();
+    ctxGrid.moveTo(x,0);
+    ctxGrid.lineTo(x,CANVAS_H);
+    ctxGrid.stroke();
+  }
+  for(let y=0;y<CANVAS_H;y+=FX.grid.size){
+    ctxGrid.beginPath();
+    ctxGrid.moveTo(0,y);
+    ctxGrid.lineTo(CANVAS_W,y);
+    ctxGrid.stroke();
+  }
+}
+
+/* Scanlines */
+function drawScan(){
+  ctxScan.clearRect(0,0,CANVAS_W,CANVAS_H);
+  ctxScan.fillStyle = FX.scan.color;
+  for(let y=0;y<CANVAS_H;y+=FX.scan.spacing){
+    ctxScan.fillRect(0,y,CANVAS_W,1);
+  }
+}
+
+/* Glitch */
+let nextGlitch = performance.now() + FX.glitch.intervalSeconds*1000;
+
+function drawGlitch(){
+  ctxGlitch.clearRect(0,0,CANVAS_W,CANVAS_H);
+
+  if(performance.now() >= nextGlitch){
+    nextGlitch = performance.now() + FX.glitch.intervalSeconds*1000;
+
+    let size = FX.glitch.sizeMin + Math.random()*(FX.glitch.sizeMax-FX.glitch.sizeMin);
+    let y = Math.random()*CANVAS_H;
+
+    ctxGlitch.fillStyle = FX.glitch.color;
+    ctxGlitch.fillRect(0,y,CANVAS_W,size);
+  }
+}
+
+/* Pulsos */
+let pulses = [];
+let nextPulse = performance.now() + FX.pulses.intervalSeconds*1000;
+
+function updatePulses(){
+  if(performance.now() >= nextPulse){
+    nextPulse = performance.now() + FX.pulses.intervalSeconds*1000;
+    for(let i=0;i<FX.pulses.amount;i++){
+      pulses.push({x:Math.random()*CANVAS_W,y:Math.random()*CANVAS_H,r:0,alpha:1});
+    }
+  }
+}
+
+function drawPulses(){
+  ctxPulses.clearRect(0,0,CANVAS_W,CANVAS_H);
+  ctxPulses.lineWidth = FX.pulses.lineWidth;
+
+  pulses.forEach(p=>{
+    p.r+=FX.pulses.speed;
+    p.alpha-=FX.pulses.fadeSpeed;
+
+    ctxPulses.strokeStyle = FX.pulses.color.replace(/\d?\.\d+\)$/,""+p.alpha+")");
+    ctxPulses.beginPath();
+    ctxPulses.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctxPulses.stroke();
+  });
+
+  pulses = pulses.filter(p=>p.r<FX.pulses.maxRadius && p.alpha>0);
+}
+
+/* Hex Grid */
+function drawHex(){
+  ctxHex.clearRect(0,0,CANVAS_W,CANVAS_H);
+  ctxHex.strokeStyle = FX.hex.color;
+
+  const size = FX.hex.size;
+  const h = size*0.866;
+
+  for(let y=0;y<CANVAS_H;y+=h){
+    for(let x=0;x<CANVAS_W;x+=size*1.5){
+      let x2 = x + ((y/h)%2)*size*0.75;
+
+      ctxHex.beginPath();
+      for(let a=0;a<6;a++){
+        let ang = Math.PI/3*a;
+        let px  = x2 + size*Math.cos(ang);
+        let py  = y  + size*Math.sin(ang);
+
+        if(a===0) ctxHex.moveTo(px,py);
+        else ctxHex.lineTo(px,py);
+      }
+      ctxHex.closePath();
+      ctxHex.stroke();
+    }
+  }
+}
+
+/* Loop */
+function loop(){
+  drawLines();
+  drawGrid();
+  drawScan();
+  drawGlitch();
+  updatePulses();
+  drawPulses();
+  drawHex();
+  requestAnimationFrame(loop);
+}
+loop();
+
+/* =Map Effects END= */
+
+const duracionPantallaNegra = 2; // Black Screen Seconds
+
+window.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => {
+    const cover = document.getElementById("blackCover");
+    cover.style.opacity = "0"; // Desvanecer
+    setTimeout(() => cover.remove(), 800);
+  }, duracionPantallaNegra * 1000);
+});
 
   </script>
   </div>
