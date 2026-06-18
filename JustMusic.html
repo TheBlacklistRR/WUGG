@@ -1,57 +1,145 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reproductor MP3 GitHub</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #0d1117;
-            color: #c9d1d9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .player-container {
-            background-color: #161b22;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            border: 1px solid #30363d;
-            width: 350px;
-        }
-        h2 {
-            margin-top: 0;
-            color: #58a6ff;
-            font-size: 1.2rem;
-        }
-        p {
-            font-size: 0.9rem;
-            color: #8b949e;
-            margin-bottom: 20px;
-        }
-        audio {
-            width: 100%;
-            outline: none;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reproductor MP3</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#111;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    margin:0;
+}
+
+.player{
+    width:450px;
+    background:#222;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 0 20px rgba(0,0,0,.5);
+}
+
+h2{
+    text-align:center;
+    margin-top:0;
+}
+
+select{
+    width:100%;
+    padding:10px;
+    margin-bottom:15px;
+    border:none;
+    border-radius:6px;
+}
+
+audio{
+    width:100%;
+}
+
+.controls{
+    display:flex;
+    gap:10px;
+    margin-top:10px;
+}
+
+button{
+    flex:1;
+    padding:10px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:bold;
+}
+</style>
 </head>
 <body>
 
-    <div class="player-container">
-        <h2>Reproductor de Audio</h2>
-        <p id="track-title">Escuchando desde GitHub</p>
-        
-        <!-- REEMPLAZA EL LINK DE ABAJO EN EL ATRIBUTO src -->
-        <audio controls>
-            <source src="https://github.com/IsabelGulloso/BlackList/raw/refs/heads/main/BLACKLIST/Music/Main%20Menu/CITY%OF%ANGELS.mp3" type="audio/mpeg">
-            Tu navegador no soporta el elemento de audio.
-        </audio>
+<div class="player">
+    <h2>Lista de Música</h2>
+
+    <select id="trackList">
+        <option value="https://github.com/IsabelGulloso/BlackList/raw/refs/heads/main/BLACKLIST/Music/Main%20Menu/CITY%20OF%20ANGELS.mp3">CITY OF ANGELS</option>
+
+        <option value="https://github.com/IsabelGulloso/BlackList/raw/refs/heads/main/BLACKLIST/Music/Main%20Menu/TRACK02.mp3">TRACK 02</option>
+
+        <option value="https://github.com/IsabelGulloso/BlackList/raw/refs/heads/main/BLACKLIST/Music/Main%20Menu/TRACK03.mp3">TRACK 03</option>
+
+        <option value="https://github.com/IsabelGulloso/BlackList/raw/refs/heads/main/BLACKLIST/Music/Main%20Menu/TRACK04.mp3">TRACK 04</option>
+
+        <option value="https://github.com/IsabelGulloso/BlackList/raw/refs/heads/main/BLACKLIST/Music/Main%20Menu/TRACK05.mp3">TRACK 05</option>
+
+        <option value="https://github.com/IsabelGulloso/BlackList/raw/refs/heads/main/BLACKLIST/Music/Main%20Menu/TRACK06.mp3">TRACK 06</option>
+
+        <option value="https://github.com/IsabelGulloso/BlackList/raw/refs/heads/main/BLACKLIST/Music/Main%20Menu/TRACK07.mp3">TRACK 07</option>
+
+        <option value="https://github.com/IsabelGulloso/BlackList/raw/refs/heads/main/BLACKLIST/Music/Main%20Menu/TRACK08.mp3">TRACK 08</option>
+
+        <option value="https://github.com/IsabelGulloso/BlackList/raw/refs/heads/main/BLACKLIST/Music/Main%20Menu/TRACK09.mp3">TRACK 09</option>
+
+        <option value="https://github.com/IsabelGulloso/BlackList/raw/refs/heads/main/BLACKLIST/Music/Main%20Menu/TRACK10.mp3">TRACK 10</option>
+    </select>
+
+    <audio id="audioPlayer" controls>
+        <source src="" type="audio/mpeg">
+        Tu navegador no soporta audio HTML5.
+    </audio>
+
+    <div class="controls">
+        <button onclick="prevTrack()">⏮ Anterior</button>
+        <button onclick="nextTrack()">⏭ Siguiente</button>
     </div>
+</div>
+
+<script>
+const player = document.getElementById("audioPlayer");
+const trackList = document.getElementById("trackList");
+
+function loadTrack(index, autoplay = false) {
+    trackList.selectedIndex = index;
+    player.src = trackList.options[index].value;
+    player.load();
+
+    if (autoplay) {
+        player.play();
+    }
+}
+
+trackList.addEventListener("change", () => {
+    player.src = trackList.value;
+    player.play();
+});
+
+function nextTrack() {
+    let index = trackList.selectedIndex + 1;
+
+    if (index >= trackList.options.length) {
+        index = 0;
+    }
+
+    loadTrack(index, true);
+}
+
+function prevTrack() {
+    let index = trackList.selectedIndex - 1;
+
+    if (index < 0) {
+        index = trackList.options.length - 1;
+    }
+
+    loadTrack(index, true);
+}
+
+player.addEventListener("ended", nextTrack);
+
+// Cargar la primera pista al iniciar
+loadTrack(0);
+</script>
 
 </body>
 </html>
